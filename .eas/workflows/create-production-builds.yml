@@ -1,7 +1,8 @@
 name: Create Production Builds
 
+# Cloud build only. Releasing the APK is handled by the GitHub Actions
+# workflow (.github/workflows/release.yml), which builds locally and publishes.
 # Run on demand: `eas workflow:run create-production-builds.yml`
-# (add an `on:` trigger later if you want it automatic on a tag/branch push).
 
 jobs:
   build_android:
@@ -10,26 +11,3 @@ jobs:
     params:
       platform: android
       profile: production
-
-  github_release:
-    name: Publish APK to GitHub Releases
-    needs: [build_android]
-    env:
-      GH_TOKEN: ${{ env.GH_TOKEN }}
-      GH_REPO: Sriram-52/evenly
-      BUILD_ID: ${{ needs.build_android.outputs.build_id }}
-      APP_VERSION: ${{ needs.build_android.outputs.app_version }}
-      APP_BUILD_VERSION: ${{ needs.build_android.outputs.app_build_version }}
-    steps:
-      - name: Check out the repo (for scripts/)
-        uses: eas/checkout
-      - name: Download the built APK from EAS
-        run: |
-          APK_URL=$(eas build:view "$BUILD_ID" --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);process.stdout.write(j.artifacts?.applicationArchiveUrl||j.artifacts?.buildUrl||"")})')
-          if [ -z "$APK_URL" ]; then echo "Could not resolve APK URL for build $BUILD_ID"; exit 1; fi
-          echo "Downloading $APK_URL"
-          curl -fL -o evenly.apk "$APK_URL"
-      - name: Publish GitHub Release
-        env:
-          APK_PATH: evenly.apk
-        run: node scripts/publish-release.mjs
