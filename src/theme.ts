@@ -1,11 +1,16 @@
-import { DynamicColorIOS, Platform } from "react-native";
+import { Appearance, DynamicColorIOS, Platform } from "react-native";
 
-// iOS dynamic color: resolves to light/dark automatically at render time, so we
-// get full dark-mode support without threading a color-scheme hook through
-// every component. On Android it falls back to the light value (adaptive
-// Android theming comes with the Android build).
+// iOS dynamic color resolves light/dark live at render time. Android has no
+// equivalent for plain JS colors, so we resolve once at startup from the system
+// scheme. (A theme switch needs an app restart on Android; the gradient backdrop
+// uses useColorScheme so it updates live regardless — acceptable for now.)
+const androidDark = Appearance.getColorScheme() === "dark";
 const dyn = (light: string, dark: string) =>
-  Platform.OS === "ios" ? DynamicColorIOS({ light, dark }) : light;
+  Platform.OS === "ios"
+    ? DynamicColorIOS({ light, dark })
+    : androidDark
+      ? dark
+      : light;
 
 export const colors = {
   // Brand reads well on both schemes, so it stays static.
