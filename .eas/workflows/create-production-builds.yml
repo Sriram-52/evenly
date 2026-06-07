@@ -1,8 +1,10 @@
 name: Create Production Builds
 
-# Cloud build only. Releasing the APK is handled by the GitHub Actions
-# workflow (.github/workflows/release.yml), which builds locally and publishes.
-# Run on demand: `eas workflow:run create-production-builds.yml`
+# EAS cloud build of the Android APK. Run on demand:
+#   eas workflow:run create-production-builds.yml
+# or directly:  eas build -p android --profile production
+# Download the resulting APK from the EAS build page (or attach it to a
+# GitHub Release manually when you want public distribution).
 
 jobs:
   build_android:
