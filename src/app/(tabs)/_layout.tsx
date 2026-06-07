@@ -8,15 +8,15 @@ export default function TabsLayout() {
   return (
     <NativeTabs tintColor={colors.brand}>
       <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Icon sf="list.bullet.rectangle" />
+        <NativeTabs.Trigger.Icon sf="list.bullet.rectangle" md="receipt_long" />
         <NativeTabs.Trigger.Label>Receipts</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="members">
-        <NativeTabs.Trigger.Icon sf="person.2.fill" />
+        <NativeTabs.Trigger.Icon sf="person.2.fill" md="group" />
         <NativeTabs.Trigger.Label>Roommates</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
-        <NativeTabs.Trigger.Icon sf="person.crop.circle" />
+        <NativeTabs.Trigger.Icon sf="person.crop.circle" md="account_circle" />
         <NativeTabs.Trigger.Label>Profile</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>

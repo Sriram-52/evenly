@@ -17,7 +17,10 @@ import {
 } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMutation, useQuery } from "convex/react";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+  DateTimePickerAndroid,
+  type DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import { api } from "@convex/_generated/api";
 import type { Id } from "@convex/_generated/dataModel";
 import { GlassSurface } from "@/components/glass-surface";
@@ -83,6 +86,12 @@ export default function ReceiptEditorScreen() {
   }
 
   const { receipt, lineItems, rosterMembers, exclusions } = data;
+
+  const purchasedDate = new Date(receipt.purchasedAt ?? receipt.createdAt);
+  const onChangePurchasedDate = (_: DateTimePickerEvent, d?: Date) => {
+    if (d) setTotals({ receiptId, purchasedAt: d.getTime() });
+  };
+
   // Participants on this receipt (includes "you"); used for the exclusion grid.
   const roster = rosterMembers;
   const rosterIds = new Set(rosterMembers.map((m) => m._id as string));
@@ -163,15 +172,31 @@ export default function ReceiptEditorScreen() {
             />
             <View style={styles.dateRow}>
               <Text style={styles.dateLabel}>Purchased</Text>
-              <DateTimePicker
-                value={new Date(receipt.purchasedAt ?? receipt.createdAt)}
-                mode="date"
-                display="compact"
-                accentColor={colors.brand}
-                onChange={(_, d) =>
-                  d && setTotals({ receiptId, purchasedAt: d.getTime() })
-                }
-              />
+              {Platform.OS === "android" ? (
+                // Android's picker is a dialog, not an inline widget — rendering
+                // it would pop immediately, so show the date and open on tap.
+                <Pressable
+                  onPress={() =>
+                    DateTimePickerAndroid.open({
+                      value: purchasedDate,
+                      mode: "date",
+                      onChange: onChangePurchasedDate,
+                    })
+                  }
+                >
+                  <Text style={styles.dateValue}>
+                    {formatPurchaseDate(purchasedDate)}
+                  </Text>
+                </Pressable>
+              ) : (
+                <DateTimePicker
+                  value={purchasedDate}
+                  mode="date"
+                  display="compact"
+                  accentColor={colors.brand}
+                  onChange={onChangePurchasedDate}
+                />
+              )}
             </View>
           </GlassSurface>
 
@@ -301,6 +326,14 @@ export default function ReceiptEditorScreen() {
   );
 }
 
+function formatPurchaseDate(d: Date): string {
+  return d.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 function DollarField({
   label,
   cents,
@@ -359,6 +392,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   dateLabel: { fontSize: 16, color: colors.text },
+  dateValue: { fontSize: 16, fontWeight: "600", color: colors.brand },
   dollarField: {
     flexDirection: "row",
     alignItems: "center",
