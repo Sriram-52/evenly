@@ -9,6 +9,7 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as demo from "../demo.js";
 import type * as entitlements from "../entitlements.js";
 import type * as exclusions from "../exclusions.js";
 import type * as extract from "../extract.js";
@@ -28,6 +29,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  demo: typeof demo;
   entitlements: typeof entitlements;
   exclusions: typeof exclusions;
   extract: typeof extract;
