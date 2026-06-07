@@ -1,0 +1,44 @@
+name: Deploy Convex
+
+# Keeps the production Convex deployment in sync with main: deploys functions +
+# schema whenever anything under convex/ (or deps/patches) changes.
+# Needs a CONVEX_DEPLOY_KEY secret (a *production* deploy key from the Convex
+# dashboard → Settings → Deploy keys). The key alone selects the deployment.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "convex/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "patches/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Deploy to Convex production
+        run: npx convex deploy --yes
+        env:
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}

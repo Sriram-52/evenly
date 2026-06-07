@@ -6,7 +6,8 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "environment": "development"
     },
     "preview": {
       "distribution": "internal",
@@ -14,11 +15,7 @@
       "android": {
         "buildType": "apk"
       },
-      "env": {
-        "EXPO_PUBLIC_CONVEX_URL": "https://opulent-pheasant-365.convex.cloud",
-        "EXPO_PUBLIC_CONVEX_SITE_URL": "https://opulent-pheasant-365.convex.site",
-        "EXPO_PUBLIC_GOOGLE_AUTH": "true"
-      }
+      "environment": "preview"
     },
     "production": {
       "channel": "production",
@@ -26,11 +23,7 @@
       "android": {
         "buildType": "apk"
       },
-      "env": {
-        "EXPO_PUBLIC_CONVEX_URL": "https://opulent-pheasant-365.convex.cloud",
-        "EXPO_PUBLIC_CONVEX_SITE_URL": "https://opulent-pheasant-365.convex.site",
-        "EXPO_PUBLIC_GOOGLE_AUTH": "true"
-      }
+      "environment": "production"
     }
   },
   "submit": {
