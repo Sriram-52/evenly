@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
@@ -12,7 +12,7 @@ import Reanimated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
-import { colors, radius, spacing } from "@/theme";
+import { radius, spacing, useColors, type ThemeColors } from "@/theme";
 
 const MIN_WIDTH = 92;
 // Drag past this fraction of the row width and it deletes on its own.
@@ -27,6 +27,8 @@ function RightAction({
   rowWidth: number;
   onDelete: () => void;
 }) {
+  const colors = useColors();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const fired = useSharedValue(false);
   // Red panel grows with the swipe (fills the row on a full drag).
   const animatedStyle = useAnimatedStyle(() => ({
@@ -85,20 +87,21 @@ export function SwipeToDelete({
   );
 }
 
-const styles = StyleSheet.create({
-  action: {
-    backgroundColor: colors.danger,
-    marginLeft: spacing.sm,
-    borderRadius: radius.md,
-    overflow: "hidden",
-    justifyContent: "center",
-  },
-  actionInner: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 2,
-    paddingHorizontal: spacing.md,
-  },
-  actionText: { color: "#fff", fontSize: 13, fontWeight: "700" },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    action: {
+      backgroundColor: colors.danger,
+      marginLeft: spacing.sm,
+      borderRadius: radius.md,
+      overflow: "hidden",
+      justifyContent: "center",
+    },
+    actionInner: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 2,
+      paddingHorizontal: spacing.md,
+    },
+    actionText: { color: "#fff", fontSize: 13, fontWeight: "700" },
+  });

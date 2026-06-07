@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -21,9 +21,11 @@ import { ScreenBackground } from "@/components/screen-background";
 import { Button } from "@/components/ui/button";
 import { SwipeToDelete } from "@/components/ui/swipe-to-delete";
 import { useUndoToast } from "@/components/ui/toast";
-import { colors, radius, spacing } from "@/theme";
+import { radius, spacing, useColors, type ThemeColors } from "@/theme";
 
 export default function MembersScreen() {
+  const colors = useColors();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const allMembers = useQuery(api.members.list);
   // "You" is a split participant, not a roommate — keep it off this list.
   const members = allMembers?.filter((m) => !m.isSelf);
@@ -148,7 +150,8 @@ export default function MembersScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
   safe: { flex: 1 },
   flex: { flex: 1 },
   header: {

@@ -1,6 +1,7 @@
-import { type ViewProps, StyleSheet, useColorScheme, View } from "react-native";
+import { useMemo } from "react";
+import { type ViewProps, StyleSheet, View } from "react-native";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
-import { colors, radius } from "@/theme";
+import { radius, useTheme, type ThemeColors } from "@/theme";
 
 // Resolve once — it can't change at runtime.
 const liquidGlass = isLiquidGlassAvailable();
@@ -15,7 +16,7 @@ type Props = ViewProps & {
  * A surface that uses native iOS 26 Liquid Glass when available and falls back
  * to a tasteful translucent card everywhere else (Android, older iOS, web).
  *
- * We pin `colorScheme` to the system scheme rather than leaving it 'auto':
+ * We pin `colorScheme` to the effective theme rather than leaving it 'auto':
  * 'auto' lets each glass view adapt its light/dark appearance to the content
  * behind it, so cards over a colored area flip dark while others stay light —
  * which looked inconsistent across a screen. Pinning keeps every card uniform.
@@ -27,7 +28,8 @@ export function GlassSurface({
   children,
   ...rest
 }: Props) {
-  const scheme = useColorScheme() === "dark" ? "dark" : "light";
+  const { scheme, colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
 
   if (liquidGlass) {
     return (
@@ -51,14 +53,15 @@ export function GlassSurface({
 
 export const isGlass = liquidGlass;
 
-const styles = StyleSheet.create({
-  base: {
-    borderRadius: radius.md,
-    overflow: "hidden",
-  },
-  fallback: {
-    backgroundColor: colors.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.surfaceBorder,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    base: {
+      borderRadius: radius.md,
+      overflow: "hidden",
+    },
+    fallback: {
+      backgroundColor: colors.surface,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.surfaceBorder,
+    },
+  });

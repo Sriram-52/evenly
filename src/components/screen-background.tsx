@@ -1,13 +1,15 @@
-import { StyleSheet, useColorScheme, View } from "react-native";
+import { useMemo } from "react";
+import { StyleSheet, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { backdrop, colors } from "@/theme";
+import { backdrop, useTheme, type ThemeColors } from "@/theme";
 
 // Soft diagonal gradient with two gentle color washes, adapting to light/dark.
 // Subtle enough to read as a refined backdrop, with enough color for the glass
-// surfaces (which are pinned to the system scheme) to pick up.
+// surfaces (which are pinned to the effective scheme) to pick up.
 export function ScreenBackground({ children }: { children: React.ReactNode }) {
-  const scheme = useColorScheme() === "dark" ? "dark" : "light";
+  const { scheme, colors } = useTheme();
   const bd = backdrop[scheme];
+  const styles = useMemo(() => makeStyles(colors), [colors]);
 
   return (
     <View style={styles.root}>
@@ -28,21 +30,22 @@ export function ScreenBackground({ children }: { children: React.ReactNode }) {
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1 },
-  wash: { position: "absolute", borderRadius: 320 },
-  washTop: {
-    width: 560,
-    height: 560,
-    backgroundColor: colors.brand,
-    top: -240,
-    right: -180,
-  },
-  washBottom: {
-    width: 520,
-    height: 520,
-    backgroundColor: colors.accent,
-    bottom: -220,
-    left: -180,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    root: { flex: 1 },
+    wash: { position: "absolute", borderRadius: 320 },
+    washTop: {
+      width: 560,
+      height: 560,
+      backgroundColor: colors.brand,
+      top: -240,
+      right: -180,
+    },
+    washBottom: {
+      width: 520,
+      height: 520,
+      backgroundColor: colors.accent,
+      bottom: -220,
+      left: -180,
+    },
+  });

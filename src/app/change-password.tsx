@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -17,9 +17,11 @@ import {
 import { useRouter } from "expo-router";
 import { authClient } from "@/lib/auth-client";
 import { ScreenBackground } from "@/components/screen-background";
-import { colors, radius, spacing } from "@/theme";
+import { radius, spacing, useColors, type ThemeColors } from "@/theme";
 
 export default function ChangePasswordScreen() {
+  const colors = useColors();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [current, setCurrent] = useState("");
@@ -95,7 +97,8 @@ export default function ChangePasswordScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
   safe: { flex: 1 },
   flex: { flex: 1 },
   container: { paddingHorizontal: spacing.xl, gap: spacing.md },

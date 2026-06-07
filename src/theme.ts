@@ -1,36 +1,74 @@
-import { Appearance, DynamicColorIOS, Platform } from "react-native";
+import { createContext, useContext } from "react";
 
-// iOS dynamic color resolves light/dark live at render time. Android has no
-// equivalent for plain JS colors, so we resolve once at startup from the system
-// scheme. (A theme switch needs an app restart on Android; the gradient backdrop
-// uses useColorScheme so it updates live regardless — acceptable for now.)
-const androidDark = Appearance.getColorScheme() === "dark";
-const dyn = (light: string, dark: string) =>
-  Platform.OS === "ios"
-    ? DynamicColorIOS({ light, dark })
-    : androidDark
-      ? dark
-      : light;
-
-export const colors = {
-  // Brand reads well on both schemes, so it stays static.
+// Scheme-independent brand + semantic colors.
+const STATIC = {
   brand: "#5B5BD6",
   brandDeep: "#4338CA",
   accent: "#EC4899",
-
-  text: dyn("#15151B", "#F4F4F8"),
-  textMuted: dyn("#6B6B7B", "#9C9CAB"),
   textOnBrand: "#FFFFFF",
-
-  // Fallback surfaces (non-Liquid-Glass platforms) + input fills.
-  surface: dyn("rgba(255,255,255,0.72)", "rgba(60,60,74,0.55)"),
-  surfaceBorder: dyn("rgba(255,255,255,0.6)", "rgba(255,255,255,0.14)"),
-  hairline: dyn("rgba(20,20,30,0.08)", "rgba(255,255,255,0.14)"),
-  inputBg: dyn("rgba(255,255,255,0.6)", "rgba(255,255,255,0.08)"),
-
   danger: "#E5484D",
   success: "#30A46C",
 };
+
+// Scheme-dependent colors. Kept as plain values (no DynamicColorIOS) so they
+// work identically on iOS and Android and can be overridden by a user-chosen
+// theme, not just the system one.
+const PALETTES = {
+  light: {
+    text: "#15151B",
+    textMuted: "#6B6B7B",
+    // Fallback surfaces (non-Liquid-Glass platforms) + input fills.
+    surface: "rgba(255,255,255,0.72)",
+    surfaceBorder: "rgba(255,255,255,0.6)",
+    hairline: "rgba(20,20,30,0.08)",
+    inputBg: "rgba(255,255,255,0.6)",
+    // Opaque background for sheets/menus (action sheet).
+    sheet: "#FFFFFF",
+  },
+  dark: {
+    text: "#F4F4F8",
+    textMuted: "#9C9CAB",
+    surface: "rgba(60,60,74,0.55)",
+    surfaceBorder: "rgba(255,255,255,0.14)",
+    hairline: "rgba(255,255,255,0.14)",
+    inputBg: "rgba(255,255,255,0.08)",
+    sheet: "#1C1C28",
+  },
+};
+
+export type ColorScheme = "light" | "dark";
+export type ThemeColors = typeof STATIC & (typeof PALETTES)["light"];
+
+export function colorsFor(scheme: ColorScheme): ThemeColors {
+  return { ...STATIC, ...PALETTES[scheme] };
+}
+
+// User's theme preference. "automatic" follows the system scheme.
+export type ThemeMode = "automatic" | "light" | "dark";
+
+export type ThemeContextValue = {
+  colors: ThemeColors;
+  scheme: ColorScheme; // effective (resolved) scheme
+  mode: ThemeMode; // user preference
+  setMode: (mode: ThemeMode) => void;
+};
+
+export const ThemeContext = createContext<ThemeContextValue>({
+  colors: colorsFor("light"),
+  scheme: "light",
+  mode: "automatic",
+  setMode: () => {},
+});
+
+// Colors for the current theme — re-renders the component when the theme changes.
+export function useColors(): ThemeColors {
+  return useContext(ThemeContext).colors;
+}
+
+// Full theme state (effective scheme + the preference + a setter).
+export function useTheme(): ThemeContextValue {
+  return useContext(ThemeContext);
+}
 
 // Background gradient stops + wash opacities per scheme (used by ScreenBackground).
 export const backdrop = {

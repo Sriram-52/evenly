@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { GlassSurface } from "@/components/glass-surface";
 import { CentsInput } from "@/components/ui/cents-input";
-import { colors, spacing } from "@/theme";
+import { spacing, useColors, type ThemeColors } from "@/theme";
 
 /**
  * Self-contained "add item" row. Keeping its state local means typing here never
@@ -16,6 +16,8 @@ export function AddItemRow({
 }: {
   onAdd: (name: string, cents: number) => void;
 }) {
+  const colors = useColors();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const nameRef = useRef("");
   const [cents, setCents] = useState(0);
   // Remount the uncontrolled name input to clear it after an add.
@@ -57,19 +59,20 @@ export function AddItemRow({
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: spacing.lg,
-    gap: spacing.sm,
-  },
-  name: { flex: 1, fontSize: 16, color: colors.text },
-  amount: {
-    fontSize: 16,
-    color: colors.text,
-    minWidth: 64,
-    textAlign: "right",
-  },
-  plus: { fontSize: 26, color: colors.brand, fontWeight: "600" },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+      padding: spacing.lg,
+      gap: spacing.sm,
+    },
+    name: { flex: 1, fontSize: 16, color: colors.text },
+    amount: {
+      fontSize: 16,
+      color: colors.text,
+      minWidth: 64,
+      textAlign: "right",
+    },
+    plus: { fontSize: 26, color: colors.brand, fontWeight: "600" },
+  });

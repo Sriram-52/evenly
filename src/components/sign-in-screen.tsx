@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { authClient } from "@/lib/auth-client";
-import { colors, radius, spacing } from "@/theme";
+import { radius, spacing, useColors, type ThemeColors } from "@/theme";
 
 type Mode = "signin" | "signup";
 
@@ -20,6 +20,8 @@ type Mode = "signin" | "signup";
 const googleAuthEnabled = process.env.EXPO_PUBLIC_GOOGLE_AUTH === "true";
 
 export function SignInScreen() {
+  const colors = useColors();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [mode, setMode] = useState<Mode>("signin");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -162,7 +164,8 @@ export function SignInScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
   safe: { flex: 1 },
   flex: { flex: 1 },
   container: {

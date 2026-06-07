@@ -6,6 +6,7 @@
     "@ai-sdk/google-vertex": "^3.0.140",
     "@better-auth/expo": "~1.6.14",
     "@convex-dev/better-auth": "^0.12.2",
+    "@expo/react-native-action-sheet": "^4.1.1",
     "@expo/ui": "~56.0.16",
     "@expo/vector-icons": "^15.1.1",
     "@react-native-community/datetimepicker": "9.1.0",

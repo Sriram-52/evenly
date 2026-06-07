@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -20,9 +21,11 @@ import type { Id } from "@convex/_generated/dataModel";
 import { GlassSurface } from "@/components/glass-surface";
 import { ScreenBackground } from "@/components/screen-background";
 import { useToast } from "@/components/ui/toast";
-import { colors, radius, spacing, formatCents } from "@/theme";
+import { radius, spacing, formatCents, useColors, type ThemeColors } from "@/theme";
 
 export default function ShareScreen() {
+  const colors = useColors();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const { id } = useLocalSearchParams<{ id: string }>();
   const receiptId = id as Id<"receipts">;
   const shares = useQuery(api.split.shareText, { receiptId });
@@ -156,7 +159,8 @@ export default function ShareScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
   safe: { flex: 1 },
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
   scroll: {

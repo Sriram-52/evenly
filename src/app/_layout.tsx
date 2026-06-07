@@ -1,4 +1,4 @@
-import { DefaultTheme, ThemeProvider, Stack } from "expo-router";
+import { DefaultTheme, ThemeProvider as NavThemeProvider, Stack } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
@@ -13,6 +13,9 @@ import { authClient } from "@/lib/auth-client";
 import { BiometricGate } from "@/components/biometric-gate";
 import { SignInScreen } from "@/components/sign-in-screen";
 import { ScreenBackground } from "@/components/screen-background";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
+import { useTheme } from "@/theme";
 
 const convex = new ConvexReactClient(
   process.env.EXPO_PUBLIC_CONVEX_URL as string,
@@ -37,12 +40,20 @@ function FullScreenLoader() {
   );
 }
 
+// Status bar icons follow the effective theme (dark icons on light, vice versa).
+function ThemedStatusBar() {
+  const { scheme } = useTheme();
+  return <StatusBar style={scheme === "dark" ? "light" : "dark"} />;
+}
+
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <ActionSheetProvider>
+      <ThemeProvider>
       <ConvexBetterAuthProvider client={convex} authClient={authClient}>
-      <ThemeProvider value={navTheme}>
-        <StatusBar style="dark" />
+      <NavThemeProvider value={navTheme}>
+        <ThemedStatusBar />
         <ScreenBackground>
           <AuthLoading>
             <FullScreenLoader />
@@ -90,8 +101,10 @@ export default function RootLayout() {
             </BiometricGate>
           </Authenticated>
         </ScreenBackground>
-      </ThemeProvider>
+      </NavThemeProvider>
       </ConvexBetterAuthProvider>
+      </ThemeProvider>
+      </ActionSheetProvider>
     </GestureHandlerRootView>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -29,9 +29,11 @@ import { Button } from "@/components/ui/button";
 import { CentsInput } from "@/components/ui/cents-input";
 import { AddItemRow } from "@/components/receipt/add-item-row";
 import { LineItemCard } from "@/components/receipt/line-item-card";
-import { colors, radius, spacing, formatCents } from "@/theme";
+import { radius, spacing, formatCents, useColors, type ThemeColors } from "@/theme";
 
 export default function ReceiptEditorScreen() {
+  const colors = useColors();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const { id } = useLocalSearchParams<{ id: string }>();
   const receiptId = id as Id<"receipts">;
   const router = useRouter();
@@ -343,6 +345,8 @@ function DollarField({
   cents: number;
   onCommit: (cents: number) => void;
 }) {
+  const colors = useColors();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [val, setVal] = useState(cents);
   // Re-sync when the value changes externally (e.g. AI extraction fills it in
   // after this field has already mounted). Doesn't clobber typing — `cents`
@@ -366,7 +370,8 @@ function DollarField({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
   safe: { flex: 1 },
   flex: { flex: 1 },
   center: { flex: 1, alignItems: "center", justifyContent: "center" },

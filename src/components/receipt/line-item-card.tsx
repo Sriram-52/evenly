@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import type { Doc, Id } from "@convex/_generated/dataModel";
 import { GlassSurface } from "@/components/glass-surface";
 import { CentsInput } from "@/components/ui/cents-input";
-import { colors, radius, spacing, initials } from "@/theme";
+import { radius, spacing, initials, useColors, type ThemeColors } from "@/theme";
 
 type Props = {
   item: Doc<"lineItems">;
@@ -23,6 +23,8 @@ export function LineItemCard({
   onUpdate,
   onRemove,
 }: Props) {
+  const colors = useColors();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [cents, setCents] = useState(item.lineTotalCents);
 
   const commitAmount = () => {
@@ -80,7 +82,8 @@ export function LineItemCard({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
   card: { padding: spacing.lg, gap: spacing.md },
   review: { borderColor: colors.accent, borderWidth: 1 },
   topRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },

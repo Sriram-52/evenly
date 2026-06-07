@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -6,7 +7,7 @@ import {
   Text,
 } from "react-native";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
-import { colors, radius, spacing } from "@/theme";
+import { radius, spacing, useColors, type ThemeColors } from "@/theme";
 
 const liquidGlass = isLiquidGlassAvailable();
 
@@ -24,6 +25,8 @@ export function Button({
   style,
   ...rest
 }: Props) {
+  const colors = useColors();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const isPrimary = variant === "primary";
 
   const content = loading ? (
@@ -65,23 +68,24 @@ export function Button({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    minHeight: 52,
-    borderRadius: radius.pill,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: spacing.xl,
-    overflow: "hidden",
-  },
-  primary: { backgroundColor: colors.brand },
-  glassFallback: {
-    backgroundColor: colors.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.surfaceBorder,
-  },
-  pressed: { opacity: 0.85 },
-  label: { fontSize: 16, fontWeight: "600" },
-  labelPrimary: { color: colors.textOnBrand },
-  labelGlass: { color: colors.brand },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    base: {
+      minHeight: 52,
+      borderRadius: radius.pill,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: spacing.xl,
+      overflow: "hidden",
+    },
+    primary: { backgroundColor: colors.brand },
+    glassFallback: {
+      backgroundColor: colors.surface,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.surfaceBorder,
+    },
+    pressed: { opacity: 0.85 },
+    label: { fontSize: 16, fontWeight: "600" },
+    labelPrimary: { color: colors.textOnBrand },
+    labelGlass: { color: colors.brand },
+  });

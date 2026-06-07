@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
-  ActionSheetIOS,
   ActivityIndicator,
   Alert,
   Platform,
@@ -25,7 +24,8 @@ import { ScreenBackground } from "@/components/screen-background";
 import { Button } from "@/components/ui/button";
 import { SwipeToDelete } from "@/components/ui/swipe-to-delete";
 import { useUndoToast } from "@/components/ui/toast";
-import { colors, radius, spacing, formatCents } from "@/theme";
+import { useActionSheet } from "@expo/react-native-action-sheet";
+import { radius, spacing, formatCents, useColors, type ThemeColors } from "@/theme";
 
 const STATUS_LABEL: Record<Doc<"receipts">["status"], string> = {
   draft: "Draft",
@@ -42,6 +42,8 @@ function formatDate(ms: number): string {
 }
 
 export default function ReceiptsScreen() {
+  const colors = useColors();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const router = useRouter();
   const receipts = useQuery(api.receipts.list);
   const createBlank = useMutation(api.receipts.createBlankReceipt);
@@ -51,6 +53,7 @@ export default function ReceiptsScreen() {
   const undoDelete = useMutation(api.receipts.undoDelete);
   const canScan = useQuery(api.entitlements.getMine)?.scanEnabled ?? false;
   const { show: showUndo, toast: undoToast } = useUndoToast();
+  const { showActionSheetWithOptions } = useActionSheet();
   const [creating, setCreating] = useState(false);
 
   const showScanUpsell = () => {
@@ -154,12 +157,9 @@ export default function ReceiptsScreen() {
     }
   };
 
+  // Cross-platform action sheet (native on iOS, themed sheet on Android).
   const startNewReceipt = () => {
-    if (Platform.OS !== "ios") {
-      newReceipt();
-      return;
-    }
-    ActionSheetIOS.showActionSheetWithOptions(
+    showActionSheetWithOptions(
       {
         title: "New receipt",
         options: [
@@ -170,8 +170,21 @@ export default function ReceiptsScreen() {
           "Cancel",
         ],
         cancelButtonIndex: 4,
+        icons: [
+          <Ionicons key="0" name="camera-outline" size={22} color={colors.brand} />,
+          <Ionicons key="1" name="image-outline" size={22} color={colors.brand} />,
+          <Ionicons key="2" name="document-text-outline" size={22} color={colors.brand} />,
+          <Ionicons key="3" name="create-outline" size={22} color={colors.brand} />,
+          <Ionicons key="4" name="close" size={22} color={colors.textMuted} />,
+        ],
+        containerStyle: { backgroundColor: colors.sheet },
+        textStyle: { color: colors.text, fontSize: 16 },
+        titleTextStyle: { color: colors.textMuted, fontSize: 13, fontWeight: "600" },
+        showSeparators: false,
+        useModal: true,
       },
       (i) => {
+        if (i === undefined) return;
         // Scan options (0–2) are gated; manual entry (3) is always free.
         if ((i === 0 || i === 1 || i === 2) && !canScan) {
           showScanUpsell();
@@ -253,7 +266,8 @@ export default function ReceiptsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
   safe: { flex: 1 },
   header: {
     paddingHorizontal: spacing.xl,

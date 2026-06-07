@@ -1,12 +1,14 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
-import { colors, spacing, radius } from "@/theme";
+import { spacing, radius, useColors, type ThemeColors } from "@/theme";
 
 /**
  * Minimal dependency-free toast. Returns a `show(message)` fn and a `toast`
  * element to render at the root of a screen (it positions itself).
  */
 export function useToast() {
+  const colors = useColors();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [message, setMessage] = useState<string | null>(null);
   const opacity = useRef(new Animated.Value(0)).current;
 
@@ -50,6 +52,8 @@ export function useToast() {
  * soft-delete: show it after deleting, and run the reversal on Undo.
  */
 export function useUndoToast() {
+  const colors = useColors();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [state, setState] = useState<{
     message: string;
     onUndo: () => void;
@@ -102,37 +106,38 @@ export function useUndoToast() {
   return { show, toast };
 }
 
-const styles = StyleSheet.create({
-  wrap: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 48,
-    alignItems: "center",
-  },
-  pill: {
-    backgroundColor: "rgba(20,20,28,0.92)",
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
-    borderRadius: radius.pill,
-  },
-  text: { color: "#fff", fontSize: 15, fontWeight: "600" },
-  undoWrap: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 110,
-    alignItems: "center",
-  },
-  undoPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.lg,
-    backgroundColor: "rgba(20,20,28,0.94)",
-    paddingLeft: spacing.xl,
-    paddingRight: spacing.lg,
-    paddingVertical: spacing.md,
-    borderRadius: radius.pill,
-  },
-  undoAction: { color: colors.brand, fontSize: 15, fontWeight: "800" },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    wrap: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      bottom: 48,
+      alignItems: "center",
+    },
+    pill: {
+      backgroundColor: "rgba(20,20,28,0.92)",
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.md,
+      borderRadius: radius.pill,
+    },
+    text: { color: "#fff", fontSize: 15, fontWeight: "600" },
+    undoWrap: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      bottom: 110,
+      alignItems: "center",
+    },
+    undoPill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.lg,
+      backgroundColor: "rgba(20,20,28,0.94)",
+      paddingLeft: spacing.xl,
+      paddingRight: spacing.lg,
+      paddingVertical: spacing.md,
+      borderRadius: radius.pill,
+    },
+    undoAction: { color: colors.brand, fontSize: 15, fontWeight: "800" },
+  });
