@@ -18,6 +18,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import Constants from "expo-constants";
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { authClient } from "@/lib/auth-client";
@@ -201,7 +202,11 @@ export default function ProfileScreen() {
 
           <Text style={styles.sectionTitle}>About</Text>
           <GlassSurface style={styles.card}>
-            <Row icon="information-circle-outline" label="Version" value="1.0.0" />
+            <Row
+              icon="information-circle-outline"
+              label="Version"
+              value={Constants.expoConfig?.version ?? "—"}
+            />
           </GlassSurface>
 
           <Pressable
