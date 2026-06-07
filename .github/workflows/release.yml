@@ -1,0 +1,31 @@
+name: Release
+
+# Triggers the EAS Workflow (.eas/workflows/create-production-builds.yml),
+# which builds the Android APK and publishes it to GitHub Releases.
+# Run manually from the Actions tab, or by pushing a v* tag.
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  trigger-eas-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Trigger EAS production build + release
+        run: eas workflow:run create-production-builds.yml
