@@ -8,7 +8,10 @@
     "scheme": "evenly",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "bundleIdentifier": "dev.codebyram.evenly"
+      "bundleIdentifier": "dev.codebyram.evenly",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "dev.codebyram.evenly",
@@ -68,6 +71,12 @@
         "projectId": "d95baeb5-8843-4361-8e3b-7291c0cd78d0"
       }
     },
-    "owner": "sriram52"
+    "owner": "sriram52",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d95baeb5-8843-4361-8e3b-7291c0cd78d0"
+    }
   }
 }
