@@ -21,10 +21,16 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: pnpm
 
       - name: Set up EAS
         uses: expo/expo-github-action@v8
@@ -32,11 +38,19 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
+      - name: Install dependencies
+        # eas build evaluates the app config (config plugins, fingerprint)
+        # locally before uploading to EAS, so node_modules must be present —
+        # even though the actual Gradle compile runs on EAS cloud.
+        run: pnpm install --frozen-lockfile
+
       - name: Read app version
         id: ver
         run: echo "version=$(node -p "require('./app.json').expo.version")" >> "$GITHUB_OUTPUT"
 
       - name: Build APK on EAS cloud and download
+        env:
+          EAS_BUILD_NO_EXPO_GO_WARNING: "true"
         run: |
           # Compiles on EAS (the runner only waits); --json gives us the build object.
           eas build --platform android --profile production --non-interactive --wait --json > build.json
