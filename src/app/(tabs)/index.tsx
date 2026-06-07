@@ -309,6 +309,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: spacing.xl,
     right: spacing.xl,
-    bottom: 96,
+    // iOS needs clearance for the floating Liquid Glass tab bar; Android's tab
+    // bar is a standard docked bar, so the button sits just above it.
+    bottom: Platform.OS === "ios" ? 96 : spacing.lg,
   },
 });
