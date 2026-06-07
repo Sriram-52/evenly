@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
+  PermissionsAndroid,
   Platform,
   Pressable,
   ScrollView,
@@ -63,6 +65,23 @@ export default function MembersScreen() {
   // so they can confirm before adding.
   const pickFromContacts = async () => {
     try {
+      // Android reads the picked contact from the provider afterward, which
+      // needs READ_CONTACTS at runtime — without it the native read throws a
+      // SecurityException that crashes the app. Request only READ (not expo's
+      // requestPermissionsAsync, which also asks for WRITE — blocked in prod).
+      // iOS's picker needs no permission.
+      if (Platform.OS === "android") {
+        const result = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+        );
+        if (result !== PermissionsAndroid.RESULTS.GRANTED) {
+          Alert.alert(
+            "Contacts access needed",
+            "Allow contacts access to add a roommate from your contacts.",
+          );
+          return;
+        }
+      }
       const contact = await Contacts.presentContactPickerAsync();
       if (!contact) return;
       const fullName =
