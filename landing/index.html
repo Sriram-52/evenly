@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Evenly — Split the grocery bill, evenly</title>
+    <meta
+      name="description"
+      content="Scan a grocery receipt, split it item-by-item, and share each person's exact total. AI receipt extraction + provably-exact cent-perfect splits. Android + iOS."
+    />
+    <link rel="icon" href="assets/favicon.png" />
+    <meta property="og:title" content="Evenly — Split the grocery bill, evenly" />
+    <meta
+      property="og:description"
+      content="Scan a receipt, toggle who's in per item, share each person's exact total."
+    />
+    <meta property="og:image" content="assets/logo.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: "#5B5BD6",
+              brandDeep: "#4338CA",
+              accent: "#EC4899",
+            },
+            fontFamily: {
+              sans: ["ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .gradient-text {
+        background: linear-gradient(100deg, #6366f1, #a855f7, #ec4899);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      /* Same backdrop as the app's ScreenBackground: a soft diagonal lavender→
+         pink gradient with a brand-purple wash (top-right) and an accent-pink
+         wash (bottom-left), so the framed screenshots blend into the page. */
+      body {
+        min-height: 100%;
+        /* Near-UNIFORM near-white-lavender base = the phone screens' dominant
+           tone, so every phone blends at any scroll position (a tall vertical
+           gradient made the bright screens read as a lighter band). Two soft
+           corner washes (brand top-right, accent bottom-left) add the app's
+           subtle brand tint without creating a mid-page band. */
+        background:
+          radial-gradient(900px 760px at 108% -4%, rgba(91, 91, 214, 0.13), transparent 72%),
+          radial-gradient(860px 720px at -8% 104%, rgba(236, 72, 153, 0.11), transparent 72%),
+          #f1f2fe;
+      }
+      .card {
+        background: #ffffff;
+        border: 1px solid rgb(226 232 240);
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -16px rgba(15, 23, 42, 0.15);
+      }
+      /* Screenshots are pre-composited into real iPhone 17 Pro (Deep Blue)
+         device frames — transparent PNGs — so we only add a contour shadow. */
+      .phone img {
+        display: block;
+        width: 100%;
+      }
+      /* A soft elliptical GROUND shadow under each phone — a separate blurred
+         oval, not a drop-shadow tracing the (dark) screen rectangle. This gives
+         a gentle "resting on the page" lift with no square halo and nothing to
+         merge between neighbours. */
+      .phone {
+        position: relative;
+      }
+      .phone::after {
+        content: "";
+        position: absolute;
+        left: 12%;
+        right: 12%;
+        bottom: -3%;
+        height: 4%;
+        background: rgba(15, 23, 42, 0.18);
+        border-radius: 50%;
+        filter: blur(12px);
+        z-index: -1;
+      }
+    </style>
+  </head>
+
+  <body class="text-slate-700 font-sans antialiased">
+    <div class="relative">
+      <!-- nav -->
+      <header class="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+        <div class="flex items-center gap-3">
+          <img src="assets/logo.png" alt="Evenly" class="h-9 w-9 rounded-xl" />
+          <span class="text-lg font-bold tracking-tight text-slate-900">Evenly</span>
+        </div>
+        <a
+          href="https://github.com/Sriram-52/evenly"
+          class="text-sm text-slate-500 transition hover:text-slate-900"
+          >GitHub ↗</a
+        >
+      </header>
+
+      <!-- hero -->
+      <section class="mx-auto grid max-w-6xl items-center gap-12 px-6 pt-12 pb-20 md:grid-cols-2 md:pt-20">
+        <div>
+          <div
+            class="mb-5 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600 shadow-sm"
+          >
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+            AI receipt scanning · exact-cent splits
+          </div>
+          <h1 class="text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl">
+            Split the grocery bill,
+            <span class="gradient-text">evenly.</span>
+          </h1>
+          <p class="mt-5 max-w-md text-lg leading-relaxed text-slate-600">
+            You fronted the Costco run for the house. The pain isn't paying — it's the
+            per-item math (<em>"don't split the tomatoes for me"</em>). Evenly scans the
+            receipt, lets you toggle who's in <strong class="text-slate-900">per item</strong>,
+            and computes everyone's exact share — to the cent.
+          </p>
+          <div class="mt-8 flex flex-wrap items-center gap-4">
+            <a
+              href="https://github.com/Sriram-52/evenly/releases/latest"
+              class="rounded-full bg-brand px-6 py-3 font-semibold text-white shadow-lg shadow-brand/30 transition hover:brightness-110"
+              >Download for Android</a
+            >
+            <span class="text-sm text-slate-500"
+              >iOS — runs on-device via a dev build (no App Store)</span
+            >
+          </div>
+        </div>
+
+        <!-- phone -->
+        <div class="flex justify-center">
+          <div class="phone w-64">
+            <img src="shots/ios-editor-light-framed.png" alt="Evenly receipt — per-item exclusions" />
+          </div>
+        </div>
+      </section>
+
+      <!-- the hard part -->
+      <section class="mx-auto max-w-6xl px-6 py-16">
+        <div class="card rounded-3xl p-8 sm:p-12">
+          <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">
+            The hard part isn't the total. It's <span class="gradient-text">who ate what.</span>
+          </h2>
+          <p class="mt-3 max-w-2xl text-slate-600">
+            Tap a person off an item and only their share changes — tax and fees redistribute
+            proportionally, and the per-person totals always sum back to the receipt, exactly.
+          </p>
+
+          <div class="mt-8 flex justify-center">
+            <figure>
+              <div class="phone mx-auto w-60">
+                <img src="shots/ios-split-light-framed.png" alt="Exact per-person split" />
+              </div>
+              <figcaption class="mt-4 text-center text-sm text-slate-500">
+                Sam skipped the chicken, Jordan the coffee — and it still sums to
+                <span class="font-semibold text-slate-900">$33.67</span>, to the cent.
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- how it works -->
+      <section class="mx-auto max-w-6xl px-6 py-16">
+        <h2 class="text-center text-2xl font-bold text-slate-900 sm:text-3xl">Three taps</h2>
+        <div class="mt-10 grid gap-6 sm:grid-cols-3">
+          <div class="card rounded-2xl p-6 text-center">
+            <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand/10 text-2xl">📸</div>
+            <h3 class="font-semibold text-slate-900">Scan</h3>
+            <p class="mt-2 text-sm text-slate-600">Photo or PDF → Gemini reads every line item.</p>
+          </div>
+          <div class="card rounded-2xl p-6 text-center">
+            <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand/10 text-2xl">👆</div>
+            <h3 class="font-semibold text-slate-900">Toggle</h3>
+            <p class="mt-2 text-sm text-slate-600">Tap people off the items they didn't share.</p>
+          </div>
+          <div class="card rounded-2xl p-6 text-center">
+            <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand/10 text-2xl">📤</div>
+            <h3 class="font-semibold text-slate-900">Share</h3>
+            <p class="mt-2 text-sm text-slate-600">Copy each person's exact total and request it.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- gallery -->
+      <section class="mx-auto max-w-6xl px-6 py-16">
+        <h2 class="text-center text-2xl font-bold text-slate-900 sm:text-3xl">Every screen</h2>
+        <p class="mt-2 text-center text-sm text-slate-500">
+          iPhone shown — Android runs the same.
+        </p>
+        <div class="mt-10 flex snap-x gap-9 overflow-x-auto pb-4">
+          <figure class="w-44 shrink-0 snap-center">
+            <div class="phone"><img src="shots/ios-receipts-light-framed.png" alt="Receipts list" /></div>
+            <figcaption class="mt-3 text-center text-xs text-slate-500">Your receipts</figcaption>
+          </figure>
+          <figure class="w-44 shrink-0 snap-center">
+            <div class="phone"><img src="shots/ios-editor-light-framed.png" alt="Per-item exclusions" /></div>
+            <figcaption class="mt-3 text-center text-xs text-slate-500">Toggle per item</figcaption>
+          </figure>
+          <figure class="w-44 shrink-0 snap-center">
+            <div class="phone"><img src="shots/ios-split-light-framed.png" alt="Exact split" /></div>
+            <figcaption class="mt-3 text-center text-xs text-slate-500">Exact split</figcaption>
+          </figure>
+          <figure class="w-44 shrink-0 snap-center">
+            <div class="phone"><img src="shots/ios-scan-light-framed.png" alt="Scan or import" /></div>
+            <figcaption class="mt-3 text-center text-xs text-slate-500">Scan or import</figcaption>
+          </figure>
+          <figure class="w-44 shrink-0 snap-center">
+            <div class="phone"><img src="shots/ios-share-light-framed.png" alt="Collect" /></div>
+            <figcaption class="mt-3 text-center text-xs text-slate-500">Collect</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- light / dark -->
+      <section class="mx-auto max-w-6xl px-6 py-16">
+        <div class="card rounded-3xl p-8 sm:p-12">
+          <div class="grid items-center gap-10 md:grid-cols-2">
+            <div>
+              <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">
+                Light or dark, <span class="gradient-text">your call.</span>
+              </h2>
+              <p class="mt-3 max-w-md text-slate-600">
+                Follow the system automatically, or pin it. Either way it's a native, edge-to-edge
+                feel — the same gradients, glass, and rounded cards on both platforms.
+              </p>
+            </div>
+            <div class="flex justify-center gap-6">
+              <figure>
+                <div class="phone w-44"><img src="shots/ios-receipts-light-framed.png" alt="Light mode" /></div>
+                <figcaption class="mt-3 text-center text-xs text-slate-500">Light</figcaption>
+              </figure>
+              <figure>
+                <div class="phone w-44"><img src="shots/ios-receipts-dark-framed.png" alt="Dark mode" /></div>
+                <figcaption class="mt-3 text-center text-xs text-slate-500">Dark</figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- features -->
+      <section class="mx-auto max-w-6xl px-6 py-16">
+        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="card rounded-2xl p-5">
+            <h3 class="font-semibold text-slate-900">Exact to the cent</h3>
+            <p class="mt-2 text-sm text-slate-600">Integer-cent largest-remainder math — no lost or extra pennies.</p>
+          </div>
+          <div class="card rounded-2xl p-5">
+            <h3 class="font-semibold text-slate-900">AI extraction</h3>
+            <p class="mt-2 text-sm text-slate-600">Gemini 2.5 Flash on Vertex AI reads receipts and invoices.</p>
+          </div>
+          <div class="card rounded-2xl p-5">
+            <h3 class="font-semibold text-slate-900">Biometric lock</h3>
+            <p class="mt-2 text-sm text-slate-600">Face ID / fingerprint gate every time you open it.</p>
+          </div>
+          <div class="card rounded-2xl p-5">
+            <h3 class="font-semibold text-slate-900">Light & dark</h3>
+            <p class="mt-2 text-sm text-slate-600">Automatic, or pick your theme. Native feel on both platforms.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- footer -->
+      <footer class="mx-auto max-w-6xl px-6 py-16">
+        <div class="card rounded-3xl p-8 text-center">
+          <img src="assets/logo.png" alt="Evenly" class="mx-auto mb-4 h-12 w-12 rounded-xl" />
+          <p class="mx-auto max-w-md text-sm text-slate-600">
+            Built with Expo, Convex, Better Auth, and Gemini on Vertex AI. The split is a pure,
+            tested, integer-only module.
+          </p>
+          <div class="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-500">
+            <span class="rounded-full border border-slate-200 px-3 py-1">Expo / React Native</span>
+            <span class="rounded-full border border-slate-200 px-3 py-1">Convex</span>
+            <span class="rounded-full border border-slate-200 px-3 py-1">Vertex AI · Gemini</span>
+            <span class="rounded-full border border-slate-200 px-3 py-1">Better Auth</span>
+          </div>
+          <div class="mt-8 flex items-center justify-center gap-6 text-sm">
+            <a href="https://github.com/Sriram-52/evenly" class="text-slate-600 transition hover:text-slate-900">Source on GitHub ↗</a>
+            <a href="https://codebyram.dev" class="text-slate-600 transition hover:text-slate-900">codebyram.dev ↗</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
