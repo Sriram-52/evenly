@@ -1,0 +1,13 @@
+diff --git a/dist/index.js b/dist/index.js
+index 702f0e272d665fdc6cd1dd2c98f4c06cf9506f76..f8dff37226a41008eab4488a75a612fe83d6012b 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -198,3 +198,8 @@ export * from './util/compilable.js';
+ export * from './util/log.js';
+ export { logOnce } from './util/log-once.js';
+ export { createQueryId } from './util/query-id.js';
++
++// Patched: re-export migration constants the kysely-adapter expects but the
++// ESM barrel omits (kysely 0.29.2). Lets @better-auth/kysely-adapter bundle in
++// Convex's esbuild runtime; this code path is dead (we use the Convex adapter).
++export { DEFAULT_MIGRATION_TABLE, DEFAULT_MIGRATION_LOCK_TABLE } from './migration/migrator.js';
