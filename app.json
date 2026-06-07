@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "evenly",
+    "name": "Evenly",
     "slug": "evenly",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "evenly",
@@ -20,12 +20,7 @@
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false,
-      "permissions": [
-        "android.permission.READ_CONTACTS",
-        "android.permission.WRITE_CONTACTS",
-        "android.permission.RECORD_AUDIO"
-      ]
+      "predictiveBackGestureEnabled": false
     },
     "web": {
       "output": "static",
@@ -57,9 +52,11 @@
         "expo-image-picker",
         {
           "photosPermission": "Evenly uses your photos to scan receipts you've saved.",
-          "cameraPermission": "Evenly uses your camera to scan grocery receipts."
+          "cameraPermission": "Evenly uses your camera to scan grocery receipts.",
+          "microphonePermission": false
         }
-      ]
+      ],
+      "./plugins/with-blocked-permissions.js"
     ],
     "experiments": {
       "typedRoutes": true,
