@@ -225,6 +225,7 @@ export const applyExtraction = internalMutation({
     feesCents: v.number(),
     discountCents: v.number(),
     printedTotalCents: v.optional(v.number()),
+    purchasedAt: v.optional(v.number()),
     items: v.array(
       v.object({
         name: v.string(),
@@ -244,6 +245,7 @@ export const applyExtraction = internalMutation({
       feesCents: args.feesCents,
       discountCents: args.discountCents,
       printedTotalCents: args.printedTotalCents,
+      purchasedAt: args.purchasedAt ?? receipt.purchasedAt,
       status: "ready",
     });
 

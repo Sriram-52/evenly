@@ -34,6 +34,12 @@ const ReceiptSchema = z.object({
     .number()
     .describe("total discounts as a POSITIVE dollar amount (0 if none)"),
   total: z.number().nullable().describe("printed grand total in dollars, or null"),
+  purchaseDate: z
+    .string()
+    .nullable()
+    .describe(
+      "purchase date printed on the receipt as YYYY-MM-DD, or null if not shown",
+    ),
   items: z.array(
     z.object({
       name: z.string().describe("product name as printed"),
@@ -53,7 +59,16 @@ Rules:
 - "items" = only purchased products, each with the dollar amount actually charged for that line.
 - Do NOT include subtotal, tax, fees, discounts, or the grand total in "items" — put those in their own fields.
 - If a line has a per-item discount, use the net price charged.
+- "purchaseDate" = the transaction date printed on the receipt, as YYYY-MM-DD (null if not shown).
 - If the image is not a readable receipt, return an empty "items" array.`;
+
+// Parse "YYYY-MM-DD" to a timestamp at noon UTC, so the calendar day is stable
+// across timezones when displayed. Returns undefined if missing/unparseable.
+function parsePurchaseDate(s: string | null): number | undefined {
+  if (!s) return undefined;
+  const t = Date.parse(`${s.trim()}T12:00:00Z`);
+  return Number.isNaN(t) ? undefined : t;
+}
 
 export const run = internalAction({
   args: { receiptId: v.id("receipts"), imageStorageId: v.id("_storage") },
@@ -95,6 +110,7 @@ export const run = internalAction({
         discountCents: toCents(object.discount),
         printedTotalCents:
           object.total != null ? toCents(object.total) : undefined,
+        purchasedAt: parsePurchaseDate(object.purchaseDate),
         items: object.items.map((it) => ({
           name: it.name,
           quantity: it.quantity ?? undefined,
