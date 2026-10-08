@@ -1,0 +1,67 @@
+name: iOS IPA
+
+# Builds an unsigned Release .ipa (for sideloading with Sideloadly/AltStore)
+# and attaches it to an existing GitHub Release. Runs after the Android job in
+# release.yml, or manually from the Actions tab to (re)build for a tag.
+#
+# Pinned to Xcode 26.5: Xcode 27 SDK builds require the UIScene lifecycle,
+# which Expo SDK 56 doesn't adopt, so they crash at launch on iOS 27.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to attach the IPA to (defaults to v<app.json version>)"
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+
+permissions:
+  contents: write # upload the IPA asset
+
+jobs:
+  build-ipa:
+    runs-on: macos-26
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.5.app/Contents/Developer
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Set up EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build IPA and upload to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          xcodebuild -version
+          scripts/build-ipa.sh --release ${{ inputs.tag }}
+
+      - name: Upload xcodebuild log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-log
+          path: ios/build_ipa/xcodebuild.log
+          if-no-files-found: ignore

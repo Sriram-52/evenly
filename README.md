@@ -17,7 +17,7 @@ Built for a real problem: when you front the bill for a houseful of roommates, t
 ## Download
 
 - **Android** — grab the `.apk` from the [latest release](https://github.com/Sriram-52/evenly/releases/latest) and sideload it
-- **iOS** — no Apple Developer account, so it runs as a local build on your own device (see [Development](#development))
+- **iOS** — grab the unsigned `.ipa` from the same release and sideload it with [Sideloadly](https://sideloadly.io) (re-signs with your Apple ID). Built on CI with Xcode 26.5 by the *iOS IPA* workflow (or locally with `scripts/build-ipa.sh --release` on Xcode 26)
 
 ## Tech
 
