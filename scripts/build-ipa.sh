@@ -32,7 +32,6 @@ if (( XCODE_MAJOR >= 27 )); then
   echo "       Use Xcode 26.x (DEVELOPER_DIR=/Applications/Xcode_26.5.app/...) or the iOS IPA workflow." >&2
   exit 1
 fi
-APP="ios/build_ipa/Build/Products/Release-iphoneos/Evenly.app"
 
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
@@ -47,12 +46,16 @@ echo "==> Syncing native project with app.json"
 CI=1 npx expo prebuild --platform ios --no-install
 (cd ios && pod install)
 
+# Prebuild names the project after app.json's "name" (older checkouts: "evenly").
+WORKSPACE=$(ls -d ios/*.xcworkspace | head -1)
+SCHEME=$(basename "$WORKSPACE" .xcworkspace)
+
 LOG="ios/build_ipa/xcodebuild.log"
 mkdir -p ios/build_ipa
 echo "==> Building v$VERSION (Release, iphoneos, unsigned) — log: $LOG"
 if ! xcodebuild \
-  -workspace ios/evenly.xcworkspace \
-  -scheme evenly \
+  -workspace "$WORKSPACE" \
+  -scheme "$SCHEME" \
   -configuration Release \
   -sdk iphoneos \
   -destination 'generic/platform=iOS' \
@@ -62,6 +65,8 @@ if ! xcodebuild \
   grep -E "error:|BUILD FAILED" "$LOG" | tail -30 >&2
   exit 1
 fi
+
+APP=$(ls -d ios/build_ipa/Build/Products/Release-iphoneos/*.app | head -1)
 
 # Guard against shipping a build pointed at the dev backend.
 if ! grep -q "$EXPO_PUBLIC_CONVEX_URL" "$APP/main.jsbundle"; then
